@@ -1,18 +1,26 @@
 # Introduction
 
-A plug-in module for the module [Token Action HUD Core](https://foundryvtt.com/packages/token-action-hud-core) which adds support for the [Cypher System](https://foundryvtt.com/packages/cyphersystem).
+A plug-in module for the module [Token Action HUD Core](https://foundryvtt.com/packages/token-action-hud-core) which adds support for the [Coriolis System](https://foundryvtt.com/packages/yzecoriolis).
 
 ## Behaviour reminders from HUD Core
 
-- The Image of the items can be displayed by selecting 'Display Icons' in the HUD Core settings.
-- Right clicking will open the item's window by selecting 'Open Item Sheet on Right-Click' in the HUD Core settings (right-clicking on a pool name will do nothing).
-- Some users might prefer to enable the 'Click to Open Categories' in the HUD Core Settings, so that hovering over HUD category names doesn't automatically open the sub-menu.
-
 ## Installation
 
-It can be installed by searching in Foundry's module installer, or by directly entering the following URL:
+At this moment the package requires manual updates to the Coriolis Core system. Be warned you may damage your instalation.
 
-https://github.com/farling42/token-action-hud-cyphersystem/releases/latest/download/module.json
+1) Add the module using 
+
+https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.1/module.json
+
+2) After the module  is downloaded BACKUP two files from your installation:
+/Data/systems/yzecoriolis/module/yzecoriolis.js
+/Data/systems/yzecoriolis/module/actor/actor.js
+
+3) replace the files:
+/Data/systems/yzecoriolis/module/yzecoriolis.js with /Data/modules/token-action-hud-coriolis/corefiles/yzecoriolis.js
+/Data/systems/yzecoriolis/module/actor/actor.js with /Data/modules/token-action-hud-coriolis/corefiles/actor.js
+4) Reload Foundry and enjoy!
+
 
 ## License
 
