@@ -8,7 +8,7 @@ A plug-in module for the module [Token Action HUD Core](https://foundryvtt.com/p
 
 At this moment the package requires manual updates to the Coriolis Core system. Be warned you may damage your instalation.
 
-1) Add the module using 
+1) Add the module using foundry module manger and custom url:
 
 https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.1/module.json
 
