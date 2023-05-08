@@ -1,22 +1,3 @@
-//log
-/*
-display - attributes - works
-display - general - works - capital leters may cause problem with roll
-display - advanced - wrong
-display - items - works
-display - talent -works
-display - problem -works
-display - weapons - not working??
-roll - attributes
-roll - general
-roll - advanced
-roll - items
-roll - talent
-roll - problem
-roll - attack? - works
-
-*/
-
 export let CoriolisActionHandler = null
 export let CoriolisRollHandler = null
 export let CoriolisSystemManager = null
@@ -91,8 +72,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
         
         _getGeneral(parent) {
-            // Loading attributes into the list.
-    //let actions = [ "dexterity", "force", "infiltration", "manipulation", "meleeCombat", "observation", "rangedCombat", "survival", "command", "culture", "dataDjinn", "medicurgy", "mysticPowers", "pilot", "science", "technology" ].map( key => {
+            // Loading skills into the list.
 
             let actions = [ "dexterity", "force", "infiltration", "manipulation", "meleeCombat", "observation", "rangedCombat", "survival" ].map( key => {
                 return {
@@ -107,7 +87,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
         }
         _getAdvanced(parent) {
-            // Loading attributes into the list.
+            // Loading advanced skills into the list.
             let actions = [ "command", "culture", "dataDjinn", "medicurgy", "pilot", "science", "technology", "mysticPowers" ].map( key => {
                 return {
                     id: key,
@@ -122,7 +102,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 		
         _getWeapon(parent) {
-            // Loading attributes into the list.
+            // Loading weapons and explosives into the list.
             let weaponList = this.actor.items.filter(i => i.type === "weapon");
             let actions = weaponList.map(i => {
                 return{
@@ -141,7 +121,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 		
         _getGear(parent) {
-            // Loading attributes into the list.
+            // Loading items into the list.
             let weaponList = this.actor.items.filter(i => i.type === "gear");
             let actions = weaponList.map(i => {
                 return{
@@ -164,7 +144,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 		
         _getTalent(parent) {
-            // Loading attributes into the list.
+            // Loading talents into the list.
             let weaponList = this.actor.items.filter(i => i.type === "talent");
             let actions = weaponList.map(i => {
                 return{
@@ -184,7 +164,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
         }
         _getInjury(parent) {
-            // Loading attributes into the list.
+            // Loading critical injuries into the list.
             let weaponList = this.actor.items.filter(i => i.type === "injury");
             let actions = weaponList.map(i => {
                 return{
@@ -205,7 +185,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
         }
         _getArmor(parent) {
-            // Loading attributes into the list.
+            // Loading armomr into the list.
             let weaponList = this.actor.items.filter(i => i.type === "armor");
             let actions = weaponList.map(i => {
                 return{
@@ -241,19 +221,10 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             const actionId = payload[1];
             const description = payload[2];
 			//console.log(actionId);
-			console.log(payload);
+
 			//console.log(description);
-			console.log(this.actor.system.attributes);
+
 			
-			let rollData = {
-				  actorType: 'pc',
-				  rollType: 'attribute',
-				  attributeKey: "strenght",
-				  attribute: 4,
-				  bonus:  0,
-				  rollTitle: "Strenght Roll",
-				  pushed: false,
-				  };
 			
             if (this.isRenderItem()) {
                 this.doRenderItem(this.actor, actionId);
