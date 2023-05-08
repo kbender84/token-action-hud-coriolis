@@ -31,6 +31,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     const TALENT_ID     = 'talents';
     const INJURY_ID     = 'injuries';
     const ARMOR_ID     = 'armors';
+	const COMBAT_ID    = 'combats';
 	
     const ACTION_ATTRIBUTES = 'attribute';
     const ACTION_GENERAL    = 'general';
@@ -40,7 +41,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     const ACTION_TALENT     = 'talent';
     const ACTION_INJURY     = 'injury';
     const ACTION_ARMOR     = 'armor';
-
+    const ACTION_COMBAT     = 'combat';
     /* ACTIONS */
 
     CoriolisActionHandler = class CoriolisActionHandler extends coreModule.api.ActionHandler {
@@ -282,12 +283,14 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 break;  					
 				
             case ACTION_ATTRIBUTES:
-                game.yzecoriolis.rollSkillMacro(actionId);
+                  game.yzecoriolis.rollActorMacro(actionId, 'attribute');
 
 				  break;
             case ACTION_GENERAL:
+			    game.yzecoriolis.rollActorMacro(actionId, 'general');
 				break;
             case ACTION_ADVANCED:
+			    game.yzecoriolis.rollActorMacro(actionId, 'advanced');
 				break;
 
             }
