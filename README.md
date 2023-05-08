@@ -10,7 +10,7 @@ At this moment the package requires manual updates to the Coriolis Core system. 
 
 1) Add the module using 
 
-[https://github.com/farling42/token-action-hud-cyphersystem/releases/latest/download/module.json](https://github.com/kbender84/token-action-hud-coriolis/releases/latest/download/module.json)
+https://github.com/kbender84/token-action-hud-coriolis/releases/latest/download/module.json
 
 2) After the module  is downloaded BACKUP two files from your installation:
 /Data/systems/yzecoriolis/module/yzecoriolis.js
