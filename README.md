@@ -12,7 +12,10 @@ At this moment the package requires manual updates to the Coriolis Core system. 
 
 https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.1/module.json
 
-2) After the module  is downloaded BACKUP two files from your installation:
+It should download token-action-hud-core, but in case it won't make sure you also have it installed
+https://foundryvtt.com/packages/token-action-hud-core
+
+2) After the module is downloaded BACKUP two files from your installation:
 /Data/systems/yzecoriolis/module/yzecoriolis.js
 /Data/systems/yzecoriolis/module/actor/actor.js
 
