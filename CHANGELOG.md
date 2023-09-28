@@ -1,4 +1,7 @@
 # CHANGELOG
+## 0.3 
+removing dependancy on manualy yzecoriolis changes
+
 
 ## 0.2
 
