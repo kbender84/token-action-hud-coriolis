@@ -5,7 +5,7 @@
     "version": "0.3",
     "compatibility": {
         "minimum": 10,
-        "verified": 10
+        "verified": 11
     },
     "authors": [
         {
@@ -47,7 +47,7 @@
         "scripts/module.js"
     ],
     "url": "https://github.com/kbender84/token-action-hud-coriolis",
-    "manifest": "https://github.com/kbender84/token-action-hud-coriolis/releases/latest/download/module.json",
+    "manifest": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.3/module.json",
     "download": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.3/token-action-hud-coriolis.zip",
     "license": "LICENSE",
     "readme": "README.md"
