@@ -3,7 +3,7 @@ export let CoriolisRollHandler = null
 export let CoriolisSystemManager = null
 
 import { coriolisRoll, coriolisModifierDialog } from "/systems/yzecoriolis/module/coriolis-roll.js";
-
+import { getCrewForShip} from "/systems/yzecoriolis/module/actor/crew.js";
 
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
@@ -42,25 +42,332 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             const token = this.token;
             if (!token) return;
             const tokenId = token.id;
+	    console.log(token);
             const actor = this.actor;
             if (!actor) return;
+            if (actor.type === 'ship') 
+            {
+		this._getShipCrew(tokenId );
+		this._getShipDetails();
+		this._getShipStats();
 
-            this._getAttributes({ id: ATTRIBUTES_ID, type: 'system' });
-            this._getGeneral   ({ id: GENERAL_ID,    type: 'system' });
-            this._getAdvanced  ({ id: ADVANCED_ID,   type: 'system' });
-            this._getWeapon    ({ id: WEAPON_ID,     type: 'system' });
-            this._getGear    ({ id: GEAR_ID,     type: 'system' });
-            this._getTalent    ({ id: TALENT_ID,     type: 'system' });
-            this._getInjury    ({ id: INJURY_ID,     type: 'system' });
-            this._getArmor    ({ id: ARMOR_ID,     type: 'system' });
+            }
 
+            if (actor.type === 'character' ||  actor.type === 'npc' ) 
+            {
+                this._getAttributes({ id: ATTRIBUTES_ID, type: 'system' });
+                this._getGeneral   ({ id: GENERAL_ID,    type: 'system' });
+                this._getAdvanced  ({ id: ADVANCED_ID,   type: 'system' });
+                this._getWeapon    ({ id: WEAPON_ID,     type: 'system' });
+                this._getGear    ({ id: GEAR_ID,     type: 'system' });
+                this._getTalent    ({ id: TALENT_ID,     type: 'system' });
+                this._getInjury    ({ id: INJURY_ID,     type: 'system' });
+                this._getArmor    ({ id: ARMOR_ID,     type: 'system' });
+            }
         
             //if (settings.get("showHudTitle")) result.hudTitle = token.name;
 
         }
 
+        _getShipCrew(tokenId ) {
+	let  crewdata = getCrewForShip(this.actor.id).map( key => {
+                return { 
+			id: key.id,
+			name: key.name,
+			img:key.img,
+			crewPosition: key.system.bio.crewPosition.position,
+			crewName: key.name,
+			encodedValue: [key.system.bio.crewPosition.position, key.id].join(this.delimiter)
 
+			}});
+        //console.log(crewdata.filter(crew => crew.crewPosition==='capitan'));
+        //console.log(crewdata);
+        let capitans = crewdata.filter(crew => crew.crewPosition==='captain').map(i => {
+            return{
+                actor_id: i.id, 
+                actor_name: i.name, 
+                img: i.img
+        }});
+        let capitansArray=[];
+        for(var each in capitans)
+            {   
+                let localcapitan = {
+                id: capitans[each].actor_id,
+                actor_id: capitans[each].actor_id, 
+		token_id: tokenId ,
+                type: 'captain',
+                actor_name: capitans[each].actor_name, 
+                img: capitans[each].img}
+                capitansArray.push(localcapitan) ;
+
+                let localcapitanInitiative = {
+                    id: capitans[each].actor_id+'Initiative' ,
+                    actor_id: capitans[each].actor_id, 
+		    token_id: tokenId ,
+                    type:'shipinitiative',
+                    actor_name: capitans[each].actor_name+ ' - Initiative', 
+                    img: capitans[each].img}
+                    capitansArray.push(localcapitanInitiative) ;
+
+            }
+        let capitansObject = capitansArray.map(i => {return{
+            id: i.id,
+			name: i.actor_name,
+			img: i.img,
+            encodedValue: [i.type,i.actor_id, i.token_id ].join(this.delimiter)    }})
+        this.addActions(capitansObject , {id:'captain', type: 'system'});
+
+	//this.addActions(crewdata.filter(crew => crew.crewPosition==='captain') , {id:'captain', type: 'system'});
+	this.addActions(crewdata.filter(crew => crew.crewPosition==='engineer') , {id:'engineer', type: 'system'});
+	this.addActions(crewdata.filter(crew => crew.crewPosition==='pilot') , {id:'pilot', type: 'system'});
+	//this.addActions(crewdata.filter(crew => crew.crewPosition==='sensorOperator') , {id:'sensorOperator', type: 'system'});
+	//this.addActions(crewdata.filter(crew => crew.crewPosition==='gunner') , {id:'gunner', type: 'system'});
+	// adding data memes and weapons
+	let shipModules= this.actor.items.filter(map => map.type ==='shipModule');
+	let shipModulesData= shipModules.filter(map => map.name === 'Data Meme');
+	let shipModulesWeapons = shipModules.filter(map => map.system.category === 'weapon').filter(map => map.name !== 'Data Meme');
+
+	let sensorOperators = crewdata.filter(crew => crew.crewPosition==='sensorOperator').map(i => {
+                return{
+                    actor_id: i.id, 
+                    actor_name: i.name, 
+                    img: i.img
+			}});
+
+	let sensorsActionsArray = [];
+	for (var sensorKey in sensorOperators )
+		{ 
+		let sensorAction = {id: sensorOperators[sensorKey].actor_id, actorId: sensorOperators[sensorKey].actor_id, img:sensorOperators[sensorKey ].img, name: sensorOperators[sensorKey ].actor_name, type:'sensorOperator'};
+		sensorsActionsArray.push(sensorAction);
+
+			for (var wepkey in shipModulesData)
+				{
+					let sensorActionsLocal ={
+					actorId: sensorOperators[sensorKey ].actor_id, 
+					weaponId: shipModulesData[wepkey]._id, 
+					img: sensorOperators[sensorKey ].img, 
+					name: sensorOperators[sensorKey ].actor_name+ ' - ' + shipModulesData[wepkey].name ,
+                    type: 'meme',
+                    damage: shipModulesData[wepkey].system.damage,
+                    damageText: shipModulesData[wepkey].system.damageText,
+                    bonus: shipModulesData[wepkey].system.bonus,
+                    range: shipModulesData[wepkey].system.range,
+                    crit: shipModulesData[wepkey].system.crit.numericValue,
+                    features:  shipModulesData[wepkey].system.special,
+                    critText:shipModulesData[wepkey].system.crit.customValue
+                };
+					sensorsActionsArray.push(sensorActionsLocal);
+                    //console.log(shipModulesData[wepkey]);
+				}; 
+
+
+		};
+
+	var sensorsActionsObject = sensorsActionsArray.map(i=>{return{
+			id: i.actorId + i.weaponId,
+			name: i.name,
+			img: i.img,
+            encodedValue: [i.type,i.actorId,i.bonus, i.weaponName, i.damage, i.crit, i.range].join(this.delimiter) 
+			}
+			}
+			);
+
+
+	this.addActions(sensorsActionsObject , {id:'sensorOperator', type: 'system'});
+
+
+	let gunners = crewdata.filter(crew => crew.crewPosition==='gunner').map(i => {
+                return{
+                    actor_id: i.id, 
+                    actor_name: i.name, 
+                    img: i.img
+			}});
+	let gunnersActions = [];
+	for (var gunkey in gunners)
+		{ 
+		let gunnerAction = {id: gunners[gunkey].actor_id, actorId: gunners[gunkey].actor_id, img:gunners[gunkey].img, name: gunners[gunkey].actor_name, type:'gunner'};
+		gunnersActions.push(gunnerAction);
+
+			for (var wepkey in shipModulesWeapons )
+				{	
+					let featurelist = Object.values(shipModulesWeapons[wepkey].system.special);
+					let gunnersActionsLocal ={
+					actorId: gunners[gunkey].actor_id, 
+					weaponId: shipModulesWeapons[wepkey]._id, 
+					img: gunners[gunkey].img, 
+					name: gunners[gunkey].actor_name+ ' - ' + shipModulesWeapons[wepkey].name ,
+                   				type:'weaponroll',
+                   				damage: shipModulesWeapons[wepkey].system.damage,
+                    				damageText: shipModulesWeapons[wepkey].system.damageText,
+                    				bonus: shipModulesWeapons[wepkey].system.bonus,
+                    				range: shipModulesWeapons[wepkey].system.range,
+                    				crit: shipModulesWeapons[wepkey].system.crit.numericValue,
+                    				features:  featurelist,
+                    				critText:shipModulesWeapons[wepkey].system.crit.customValue ,
+					weaponName: shipModulesWeapons[wepkey].name               
+                };
+					gunnersActions.push(gunnersActionsLocal);
+                    //console.log(shipModulesWeapons[wepkey]);
+                   //console.log(gunnersActionsLocal.features);
+				}; 
+
+		};
+
+	var gunnerActionsObject = gunnersActions.map(i=>{return{
+			id: i.actorId + i.weaponId,
+			name: i.name,
+			img: i.img,
+            encodedValue: [i.type,i.actorId,i.bonus, i.weaponName, i.damage, i.crit, i.range, i.features,i.damageText,i.critText].join(this.delimiter) 
+        	}            
+			}
+			);
+
+	
+	this.addActions(gunnerActionsObject , {id:'gunner', type: 'system'});
+        }
+
+
+	
+	_getShipStats(){
+	    let shipArmor = this.actor.system.armor.value;
+	    let shipHull = this.actor.system.hullPoints.value;
+	    let shipEnergy = this.actor.system.maxEnergyPoints;
+	    //adding ship stats
+		let actions = [
+		{
+		    id: 'shipsstatsa',
+                    name: shipArmor.toString(), 
+		    description: 'Ship Armor' ,
+		    encodedValue: ['shipsstatsa', this.actor._id, shipArmor.toString()].join(this.delimiter)
+ 
+                }];
+	    this.addActions(actions, {id:'shipsstatsa', type: 'system'});
+		actions = [
+		{
+		    id: 'shipsstatsh',
+                    description: 'Ship Hull Points',
+		    name: shipHull.toString() ,
+		    encodedValue: ['shipsstatsh', shipHull.toString()].join(this.delimiter)
+
+                }]
+	    this.addActions(actions, {id:'shipsstatsh', type: 'system'});
+		actions = [
+		{
+		    id: 'shipsstatse',
+                    description: 'Ship Energy Points',
+		    name: shipEnergy.toString() ,
+		    encodedValue: ['shipsstatse', shipEnergy.toString()].join(this.delimiter)
+
+                }
+
+		];
+	    this.addActions(actions, {id:'shipsstatse', type: 'system'});
+	actions = [
+		{
+		    id: 'shipsstatscritical',
+                    description: 'Ship Critical Damage Roll',
+		    name: 'Roll Critical Damage' ,
+		    encodedValue: ['shipsstatscritical', 'Ship Critical Damage'].join(this.delimiter)
+
+
+        }];
+	    this.addActions(actions, {id:'shipsstatscritical', type: 'system'});
+
+
+
+
+
+        }
+
+
+     _getShipDetails() {
+	 // Loading  ship modules into the list.
+            let shipModules= this.actor.items.filter(map => map.type ==='shipModule');
+	    let shipModulesNoWeapons = shipModules.filter(map => map.system.category !== 'weapon');
+            let actions = shipModulesNoWeapons.map(i => {
+                return{
+                    id: i._id, 
+                    name: i.name, 
+		    description: i.system.description,
+                    encodedValue: ['shipModule', i.name, i.system.description].join(this.delimiter),
+                    img: i.img
+                    }
+                    }
+                    );
         
+            //console.log('Modules, actions');
+	    //console.log(actions);
+            this.addActions(actions, {id:'shipModule', type: 'system'});
+
+	 // Loading  ship modules into the list.
+            let shipWeapons= shipModules.filter(map => map.system.category === 'weapon');
+            actions = shipWeapons.map(i => {
+                return{
+                    id: i._id, 
+                    name: i.name, 
+		            description: i.system.description,
+                    encodedValue: ['shipWeapon', i.name, i.system.description, i.system.damage,i.system.damageText, i.system.bonus, i.system.range].join(this.delimiter),
+                    img: i.img,
+                    damage: i.system.damage,
+                    damateText: i.system.damageText,
+                    bonus: i.system.bonus,
+                    range: i.system.range
+                    }
+                    }
+                    );
+	
+            //console.log('Weapons, actions');
+	    //console.log(actions);
+            this.addActions(actions, {id:'shipWeapon', type: 'system'});
+
+	    let shipProblems = this.actor._source.items.filter(map => map.type ==='shipProblem');
+		actions = shipProblems.map(i => {
+                return{
+                    id: i._id, 
+                    name: i.name, 
+		    description: i.system.description,
+                    encodedValue: ['shipProblem', i.name, i.system.description].join(this.delimiter),
+                    img: i.img                    }
+                    }
+                    );
+	    //console.log(actions);
+
+	    this.addActions(actions, {id:'shipProblem', type: 'system'});
+
+
+	    let shipFeatures = this.actor._source.items.filter(map => map.type ==='shipFeature');
+		actions = shipFeatures.map(i => {
+                return{
+                    id: i._id, 
+                    name: i.name, 
+		    description: i.system.description,
+                    encodedValue: ['shipFeature', i.name, i.system.description].join(this.delimiter),
+                    img: i.img                    }
+                    }
+                    );
+	    //console.log(actions);
+
+	    this.addActions(actions, {id:'shipFeature', type: 'system'});
+
+	    let shipDamage = this.actor._source.items.filter(map => map.type ==='shipCriticalDamage');
+		actions = shipDamage.map(i => {
+                return{
+                    id: i._id, 
+                    name: i.name, 
+		    description: i.system.description,
+                    encodedValue: ['shipDamage', i.name, i.system.description].join(this.delimiter),
+                    img: i.img                    }
+                    }
+                    );
+	    //console.log(actions);
+
+	    this.addActions(actions, {id:'shipsstatscritical', type: 'system'});
+
+
+
+        }
+
+
         _getAttributes(parent) {
             // Loading attributes into the list.
             let actions = [ "strength", "agility", "wits", "empathy" ].map( key => {
@@ -113,7 +420,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 return{
                     id: i._id, 
                     name: i.name, 
-					description: i.system.description,
+			description: i.system.description,
                     encodedValue: [ACTION_WEAPON, i.name, i.system.description].join(this.delimiter),
                     img: i.img
                     }
@@ -187,6 +494,18 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         
             //console.log(actions);
             this.addActions(actions, parent);
+		actions = [
+		{
+		    id: 'criticalinjuryroll',
+                    description: 'Critical Injury Roll',
+		    name: 'Roll Critical Injury' ,
+		    encodedValue: ['criticalinjuryroll', 'Ship Critical Injury'].join(this.delimiter)
+
+
+        }];
+            this.addActions(actions, parent);
+
+
 
         }
         _getArmor(parent) {
@@ -225,11 +544,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             const macroType = payload[0];
             const actionId = payload[1];
             const description = payload[2];
-			//console.log(actionId);
-
-			//console.log(description);
-
-			
+			console.log(payload);
 			
             if (this.isRenderItem()) {
                 this.doRenderItem(this.actor, actionId);
@@ -237,30 +552,63 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             }
             let rData = [];    
             switch (macroType) {
-			case ACTION_WEAPON:
+		case ACTION_WEAPON:
                 // item-roll
                 game.yzecoriolis.rollItemMacro(actionId);
                 break;
+	    case 'captain':
+           rollActorMacro('Command','advanced', actionId );
+           break;
+
+        case 'shipinitiative':
+            shipInitiative( actionId, payload[2] );
+            // SERVICE!
+            break;
+
+        case 'weaponroll':
+		//console.log(payload);
+
+            rollActorMacro('rangedCombat','shipWeapon', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
+            break;
+        case 'meme':
+            rollActorMacro('DataDjinn','meme', actionId, payload[2] );
+            break;
+    
+     	case 'engineer':
+		    rollActorMacro('Technology', 'advanced',actionId  );
+		    //console.log('engisss');
+		    break;
+	    case 'sensorOperator':
+		    rollActorMacro('DataDjinn','advanced', actionId );
+		    //console.log('sensoropssss');
+		    break;
+	    case 'pilot':
+		    rollActorMacro( 'Pilot', 'advanced', actionId );
+		    //console.log('pilotsss');
+		    break;
+	    case 'gunner':
+		    rollActorMacro(  'rangedCombat', 'general', actionId );
+		//    console.log('phewphew');
+		    break;
+
             case ACTION_ARMOR:
                 // item-roll
                 game.yzecoriolis.rollItemMacro(actionId);
                 break;  	
-			case ACTION_GEAR:
+	    case ACTION_GEAR:
 			// item-display 
-				this._chatItem('<h2>Gear - '+actionId+'</h2>'+'<b>Equiped:</b> '+payload[3]+', <b>Quantity: </b>'+payload[4]+'<br>'+description);
+			this._chatItem('<h2>Gear: '+actionId+'</h2>'+'<b>Equiped:</b> '+payload[3]+', <b>Quantity: </b>'+payload[4]+'<br>'+description);
                 break;  	
-			case ACTION_TALENT:
+	    case ACTION_TALENT:
 			// item-display 
-				this._chatItem('<h2>Talent - '+actionId+'</h2>'+'<b>'+payload[3]+'</b><br>'+description);
+			this._chatItem('<h2>Talent: '+actionId+'</h2>'+'<b>'+payload[3]+'</b><br>'+description);
                 break;  					
-			case ACTION_INJURY:
+	    case ACTION_INJURY:
 			// item-display 
-				this._chatItem('<h2>Injury - '+actionId+'</h2>'+'<b>Fatal:</b> '+payload[3]+', <b>Healing time:</b>'+payload[4]+'<br>' +description);
-                break;  					
-				
+			this._chatItem('<h2>Injury: '+actionId+'</h2>'+'<b>Fatal:</b> '+payload[3]+', <b>Healing time:</b>'+payload[4]+'<br>' +description);
+                break;  						
             case ACTION_ATTRIBUTES:
                   rollActorMacro(actionId, 'attribute');
-
 				  break;
             case ACTION_GENERAL:
 			    rollActorMacro(actionId, 'general');
@@ -269,8 +617,56 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 			    rollActorMacro(actionId, 'advanced');
 				break;
 
-            }
+	    case 'shipFeature':
+			// item-display 
+			this._chatItem('<h2>Feature: '+actionId+'</h2>'+description);
+			break;
+	    case 'shipDamage':
+			// item-display 
+			this._chatItem('<h2>Damage: '+actionId+'</h2>'+description);
+			break;
 
+
+	    case 'shipProblem':
+			// item-display 
+			this._chatItem('<h2>Problem: '+actionId+'</h2>'+description);
+		break;
+	    case 'shipsstatsa':
+			//this._chatItem('<h2>Ship Armor: '+payload[2]+'</h2>');
+            rollActorMacro(actionId, 'armor',payload[1],payload[2]);
+			//SERVICE HUDroll(actionId,'armorRoll');
+
+		break;
+	    case 'shipsstatse':
+			// item-display 
+			this._chatItem('<h2>Energy Points total: '+actionId+'</h2>');
+		break;
+	    case 'shipsstatsh':
+			this._chatItem('<h2>Hull Points left: '+actionId+'</h2>');
+		break;
+	    case 'shipsstatscritical':
+			//this._chatItem('<h2>Hull Points left: '+actionId+'</h2>');
+			var table = game.tables.find(t => t.name === "Table 7.16 Critical Ship Damage");
+			table.draw({roll: true, displayChat: true});
+		break;
+	    case 'criticalinjuryroll':
+			var table = game.tables.find(t => t.name === "Table 5.6 Critical Injuries");
+			table.draw({roll: true, displayChat: true});
+		break;
+
+
+	    case 'shipModule':
+			// item-display 
+			this._chatItem('<h2>Module: '+actionId+'</h2><b>'+description);
+
+		break;
+	    case 'shipWeapon':
+			this._chatItem('<h2>Weapon: '+payload[1]+'</h2><b> Skill Bonus: '+payload[5]+'</b><b> Damage: '+payload[3] + ' ' + payload[4]+'</b><b> Range: '+payload[6]+'</b>'+payload[2]);
+
+		break;
+
+            }
+		//console.log(payload);
             // Ensure the HUD reflects the new conditions
             Hooks.callAll('forceUpdateTokenActionHud');
         }
@@ -290,12 +686,46 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     
       
        //token_action_hud addition
- function HUDroll(skillName,inputRollType, actorData) {
+ 	function shipInitiative(actorIdcrew, shipTokenId)
+	{
+		var actorData =game.actors.filter(a=>  a.id == actorIdcrew)[0];
+
+		var dicePool = actorData.system.attributes['empathy'].value + actorData.system.skills['command'].value;
+		var arrayResult=[];
+		for(let  i =0 ;i< dicePool;i++)
+			{	
+				var dice = Math.floor( Math.random() * 6 );
+				arrayResult.push(dice);
+			};
+		//console.log(arrayResult);
+		var maxResult = Math.max.apply(null,arrayResult);
+		//console.log(maxResult);
+		var countMaxResult = 0;
+
+          	for(let  i =0 ;i< dicePool;i++)
+          	{
+			if (arrayResult[i]===maxResult)countMaxResult++;
+            
+          	};
+		var inititativeScore = maxResult+'.'+countMaxResult;
+		var combatantId = game.combat.combatants.find (i=>i._source.tokenId === shipTokenId)._id;
+		console.log(combatantId );
+
+		let initiative = [{
+            		_id: combatantId ,
+            		initiative:inititativeScore 
+        	}];
+    		
+    		game.combat.updateEmbeddedDocuments("Combatant", initiative);	}
+
+
+ function HUDroll(skillName,inputRollType, actorData, itemData, title, damage, crit, range, features, damageText, critText) {
     //const item = this.actor.system.attributes.wits: null;
-	console.log('debug');
-	console.log(skillName);
-	console.log(inputRollType);
-    console.log(actorData.system);
+	console.log('HUDroll details');
+    //console.log(features);
+    if(inputRollType==='shipsstatsa')
+    inputRollType='armor';
+    var bonusRoll = Number(itemData);
 	const actor = actorData;
 	let attributeForSkill= 'wits';
 	switch (skillName){
@@ -334,16 +764,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 				  attributeKey: skillName,
 				  attribute: actorData.system.attributes[skillName].value, 
 				  modifier: 0,
-				  bonus: 0,
+				  bonus: bonusRoll,
 				  rollTitle: game.i18n.localize(`YZECORIOLIS.Attr${skillName.capitalize()}`)+' Roll', 
 				  pushed: false
 				};
 				break;
+			
 			case 'general' :
 			case 'advanced' :
                 rollData = {
-					//{rollType, skill, attribute, modifier} rollData
-					//attributes[rollData.attributeKey]
+
 				  actorType: actorData.type,
 				  rollType: inputRollType,
 				  attributeKey: attributeForSkill,
@@ -351,20 +781,75 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 			      skillKey: skillName.toLowerCase(),
 			      skill: actorData.system.skills[skillName.toLowerCase()].value,//dataset.skillkey ? actorData.skills[dataset.skillkey].value : 0,
 				  modifier: 0,
-				  bonus: 0,
+				  bonus: bonusRoll,
 				  rollTitle: game.i18n.localize(`YZECORIOLIS.Skill${skillName.capitalize()}`)+' Roll', //import nice name
 				  pushed: false
 				  //features: item?.special ? Object.values(item.special).join(", ") : "",
 				};
 			break;
-			
+			case 'armorRoll':
+            case 'armor':
+			//actorData=this.actor;
+			rollData = {
+				actorType: 'npc',
+				rollType: 'armor',
+				bonus: bonusRoll,
+                modifier: 0,
+                attributeKey: 'strenght',
+                attribute: 1, 
+                skillKey: 'agility',
+                skill: 1,
+                features: 'Core Rules',
+                rollTitle: 'Armor Roll'
+				};
+			break;
+            case 'meme':
+                rollData = {
+                    actorType: 'npc',
+                    rollType: 'weapon',
+                    bonus: bonusRoll,
+                    modifier: 0,
+                    attributeKey: 'wits',
+                    attribute: actorData.system.attributes['wits'].value, 
+                    skillKey: 'dataDjinn',
+                    skill: actorData.system.skills['datadjinn'].value,
+                    features: 'Core Rules',
+                    rollTitle: 'Data Meme',
+                    damage: 0,
+                    damageText: 'Ship module',
+                    crit: 0,
+                    critText: '',
+                    range: 'long'
+                    };
+                break;
+            case 'shipWeapon':
+			//actorData=this.actor;
+                rollData = {
+                    actorType: 'npc',
+                    rollType: 'weapon',
+                    bonus: bonusRoll,
+                    modifier: 0,
+                    attributeKey: 'agility',
+                    attribute: actorData.system.attributes['agility'].value, 
+                    skillKey: 'rangedCombat',
+                    skill: actorData.system.skills['rangedcombat'].value,
+                    features: features,
+                    rollTitle: title,
+                    damage: damage,
+                    damageText: damageText,
+                    crit: Number(crit),
+                    critText: critText,
+                    range: range
+                    };
+                break;
+			//title, damage, crit, range
 	}
 	
     const chatOptions = actor._prepareChatRollOptions(
       "systems/yzecoriolis/templates/sidebar/roll.html",
      inputRollType
     );
-
+    console.log(rollData);
     coriolisModifierDialog((modifier, additionalData) => {
       rollData.modifier = modifier;
       rollData.additionalData = additionalData;
@@ -373,7 +858,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     
   }
 
-      function rollActorMacro(rollName, rollType) {
+      function rollActorMacro(rollName, rollType, actorIdcrew, itemId, title, damage, crit, range, features, damageText, critText) {
   		const speaker = ChatMessage.getSpeaker();
   		let actor;
   		if (speaker.token) actor = game.actors.tokens[speaker.token];
@@ -381,7 +866,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
   		if (!actor) {
     			return ui.notifications.warn(game.i18n.localize("YZECORIOLIS.ErrorsNoActorSelectedForMacro"));
   			}
-  		return HUDroll(rollName, rollType, actor);
+		if (typeof actorIdcrew !== "undefined") {
+			actor=game.actors.filter(a=>  a.id == actorIdcrew)[0];
+		}
+        if(itemId)
+        {
+            return HUDroll(rollName, rollType, actor,itemId, title, damage, crit, range, features, damageText, critText);
+        }
+        else
+        {return HUDroll(rollName, rollType, actor);};
+
+        
 	}
 
     // Core Module Imports
@@ -417,10 +912,142 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             const GEAR_NAME		 = game.i18n.localize('YZECORIOLIS.Gear');
             const INJURY_NAME		 = game.i18n.localize('YZECORIOLIS.CriticalInjuries');
             const ARMOR_NAME		 = game.i18n.localize('YZECORIOLIS.Armor');
-			
+
             const DEFAULTS = {
                 layout: [
-                    { 
+                     { 
+                        nestId: 'crew',
+                        id:     'crew',
+                        name:   'Crew',
+                        type:   'system',
+                        groups: [
+                            {
+                                nestId: 'crew_crew',
+                                id:     'crew',
+                                name:   'Crew' ,
+                                type:   'system'
+                            },
+ 			    {
+                                nestId: 'crew_captain',
+                                id:     'captain',
+                                name:   'Captain' ,
+                                type:   'system'
+                            },
+ 			    {
+                                nestId: 'crew_engieneer',
+                                id:     'engineer',
+                                name:   'Engineer' ,
+                                type:   'system'
+                            },
+ 			    {
+                                nestId: 'crew_pilot',
+                                id:     'pilot',
+                                name:   'Pilot' ,
+                                type:   'system'
+                            },
+ 			    {
+                                nestId: 'crew_sensorOperator',
+                                id:     'sensorOperator',
+                                name:   'Sensor Operator' ,
+                                type:   'system'
+                            },
+ 			    {
+                                nestId: 'crew_gunner',
+                                id:     'gunner',
+                                name:   'Gunner' ,
+                                type:   'system'
+                            }
+
+
+
+                        ]
+                    },                      
+			{ 
+                        nestId: 'shipsstats',
+                        id:     'shipsstats',
+                        name:   'Ship',
+                        type:   'system',
+                        groups: [
+                            {
+                                nestId: 'shipsstats_critical',
+                                id:     'shipsstatscritical',
+                                name:   'Ship Critical Damage' ,
+                                type:   'system'
+                            },
+                            {
+                                nestId: 'shipsstats_hull',
+                                id:     'shipsstatsh',
+                                name:   'Ship Hull' ,
+                                type:   'system'
+                            },
+                            {
+                                nestId: 'shipsstats_armor',
+                                id:     'shipsstatsa',
+                                name:   'Ship Armor' ,
+                                type:   'system'
+                            },
+                            {
+                                nestId: 'shipsstats_energy',
+                                id:     'shipsstatse',
+                                name:   'Ship Energy' ,
+                                type:   'system'
+                            }
+
+
+                        ]
+                    }, 
+		    { 
+                        nestId: 'shipModules',
+                        id:     'shipModules',
+                        name:   'Ship Modules',
+                        type:   'system',
+                        groups: [
+                            {
+                                nestId: 'shipModules_weapon',
+                                id:     'shipWeapon',
+                                name:   'Ship Weapons' ,
+                                type:   'system',
+                            },
+                            {
+                                nestId: 'shipModules_modules',
+                                id:     'shipModule',
+                                name:   'Ship Modules' ,
+                                type:   'system'
+                            }
+
+			]
+		},
+		{	
+			nestId: 'shipFeatures',
+                        id:     'shipFeatures',
+                        name:   'Ship Features',
+                        type:   'system',
+                        groups: [
+                            {
+                                nestId: 'shipFeatures_Feature',
+                                id:     'shipFeature',
+                                name:   'Ship Features' ,
+                                type:   'system'
+                            },
+                            {
+                                nestId: 'shipFeatures_Problem',
+                                id:     'shipProblem',
+                                name:   'Ship Problem' ,
+                                type:   'system'
+                            }/*,
+
+                            {
+                                nestId: 'shipFeatures_Damage',
+                                id:     'shipDamage',
+                                name:   'Ship Damage' ,
+                                type:   'system'
+                            }*/
+
+			]
+		},
+
+
+		{ 
                         nestId: ATTRIBUTES_ID,
                         id:     ATTRIBUTES_ID,
                         name:   ATTRIBUTES_NAME,
@@ -534,7 +1161,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                         ]
                     }
                 ],
-                groups: [
+                groups: [                    
+		    { id: 'crew', name: 'Crew', type: 'system', hasDerivedSubcategories: true },
+		    { id: 'shipModules', name: 'Ship Modules', type: 'system', hasDerivedSubcategories: true },
+		    { id: 'shipFeatures', name: 'Ship Features', type: 'system', hasDerivedSubcategories: true },
+		    { id: 'shipstats', name: 'Ship Stats', type: 'system', hasDerivedSubcategories: true },
                     { id: ATTRIBUTES_ID, name: ATTRIBUTES_NAME, type: 'system', hasDerivedSubcategories: false },
                     { id: GENERAL_ID, name: GENERAL_NAME, type: 'system', hasDerivedSubcategories: false },
                     { id: ADVANCED_ID, name: ADVANCED_NAME, type: 'system', hasDerivedSubcategories: false },
