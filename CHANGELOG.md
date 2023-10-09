@@ -1,4 +1,6 @@
 # CHANGELOG
+## 1.0
+Found issue with LibWrapper / resolved, and ready for the 1.0 release
 
 ## 0.9
 Ships actors added! Crittical rolls from character sheet! Ship initiative! This is dev release, if all goes fine, will be updated to 1.0

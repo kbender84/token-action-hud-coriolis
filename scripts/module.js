@@ -42,7 +42,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             const token = this.token;
             if (!token) return;
             const tokenId = token.id;
-	    console.log(token);
+	    //console.log(token);
             const actor = this.actor;
             if (!actor) return;
             if (actor.type === 'ship') 
@@ -52,7 +52,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 		this._getShipStats();
 
             }
-
+		//console.log(actor);
             if (actor.type === 'character' ||  actor.type === 'npc' ) 
             {
                 this._getAttributes({ id: ATTRIBUTES_ID, type: 'system' });
@@ -89,7 +89,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 img: i.img
         }});
         let capitansArray=[];
-        for(var each in capitans)
+        for(var each = 0 ; each < capitans.length; each++)
             {   
                 let localcapitan = {
                 id: capitans[each].actor_id,
@@ -135,13 +135,13 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 			}});
 
 	let sensorsActionsArray = [];
-	for (var sensorKey in sensorOperators )
+	for (var sensorKey = 0; sensorKey < sensorOperators.length; sensorKey++ )
 		{ 
 		let sensorAction = {id: sensorOperators[sensorKey].actor_id, actorId: sensorOperators[sensorKey].actor_id, img:sensorOperators[sensorKey ].img, name: sensorOperators[sensorKey ].actor_name, type:'sensorOperator'};
 		sensorsActionsArray.push(sensorAction);
 
-			for (var wepkey in shipModulesData)
-				{
+			for (var wepkey = 0 ; wepkey  <shipModulesData.length; wepkey++)
+				{ 
 					let sensorActionsLocal ={
 					actorId: sensorOperators[sensorKey ].actor_id, 
 					weaponId: shipModulesData[wepkey]._id, 
@@ -183,16 +183,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     img: i.img
 			}});
 	let gunnersActions = [];
-	for (var gunkey in gunners)
+
+	for (var gunkey = 0; gunkey < gunners.length; gunners++)
 		{ 
 		let gunnerAction = {id: gunners[gunkey].actor_id, actorId: gunners[gunkey].actor_id, img:gunners[gunkey].img, name: gunners[gunkey].actor_name, type:'gunner'};
 		gunnersActions.push(gunnerAction);
 
-			for (var wepkey in shipModulesWeapons )
-				{	
+			for (var wepkey =0 ;wepkey < shipModulesWeapons.length; wepkey++)
+				{		
 					let featurelist = Object.values(shipModulesWeapons[wepkey].system.special);
 					let gunnersActionsLocal ={
-					actorId: gunners[gunkey].actor_id, 
+					actorId: gunners[gunkey].actor_id,
 					weaponId: shipModulesWeapons[wepkey]._id, 
 					img: gunners[gunkey].img, 
 					name: gunners[gunkey].actor_name+ ' - ' + shipModulesWeapons[wepkey].name ,
@@ -204,7 +205,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     				crit: shipModulesWeapons[wepkey].system.crit.numericValue,
                     				features:  featurelist,
                     				critText:shipModulesWeapons[wepkey].system.crit.customValue ,
-					weaponName: shipModulesWeapons[wepkey].name               
+					weaponName: shipModulesWeapons[wepkey].name              
                 };
 					gunnersActions.push(gunnersActionsLocal);
                     //console.log(shipModulesWeapons[wepkey]);
@@ -849,7 +850,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
       "systems/yzecoriolis/templates/sidebar/roll.html",
      inputRollType
     );
-    console.log(rollData);
+   // console.log(rollData);
     coriolisModifierDialog((modifier, additionalData) => {
       rollData.modifier = modifier;
       rollData.additionalData = additionalData;
