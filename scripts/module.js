@@ -184,7 +184,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 			}});
 	let gunnersActions = [];
 
-	for (var gunkey = 0; gunkey < gunners.length; gunners++)
+	for (var gunkey = 0; gunkey < gunners.length; gunkey ++)
 		{ 
 		let gunnerAction = {id: gunners[gunkey].actor_id, actorId: gunners[gunkey].actor_id, img:gunners[gunkey].img, name: gunners[gunkey].actor_name, type:'gunner'};
 		gunnersActions.push(gunnerAction);
