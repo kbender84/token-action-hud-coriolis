@@ -5,6 +5,9 @@ A plug-in module for the module [Token Action HUD Core](https://foundryvtt.com/p
 ## Behaviour reminders from HUD Core
 A plug-in module for the module Token Action HUD Core
 
+
+![coriolis_hud](https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/63ef03ca-824d-4161-ae8d-4034ea7991d9)
+
 Adds actor actions in form of HUD overlay over the game scene. Now majority of your character and ship actions can be performed without opening the actor sheet!
 
 Version 1.0 supports Player character and NPC actions including rolls for crittical injuries:
