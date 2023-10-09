@@ -3,29 +3,35 @@
 A plug-in module for the module [Token Action HUD Core](https://foundryvtt.com/packages/token-action-hud-core) which adds support for the [Coriolis System](https://foundryvtt.com/packages/yzecoriolis).
 
 ## Behaviour reminders from HUD Core
+A plug-in module for the module Token Action HUD Core
 
-## Installation
+Adds actor actions in form of HUD overlay over the game scene. Now majority of your character and ship actions can be performed without opening the actor sheet!
 
-At this moment the package requires manual updates to the Coriolis Core system. Be warned you may damage your instalation.
+Version 1.0 supports Player character and NPC actions including rolls for crittical injuries:
 
-1) Add the module using foundry module manger and custom url:
+https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/e03df26c-8032-46bb-9cae-f8871c7918ee
 
-https://github.com/kbender84/token-action-hud-coriolis/releases/download/0.1/module.json
+It also adds Ship character sheet to the HUD:
 
-It should download token-action-hud-core, but in case it won't make sure you also have it installed
-https://foundryvtt.com/packages/token-action-hud-core
 
-2) After the module is downloaded BACKUP two files from your installation:
-/Data/systems/yzecoriolis/module/yzecoriolis.js
-/Data/systems/yzecoriolis/module/actor/actor.js
+https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/7fc59ee8-5bbb-4751-95ce-600e8e5d7643
 
-3) replace the files:
-/Data/systems/yzecoriolis/module/yzecoriolis.js with /Data/modules/token-action-hud-coriolis/corefiles/yzecoriolis.js
-/Data/systems/yzecoriolis/module/actor/actor.js with /Data/modules/token-action-hud-coriolis/corefiles/actor.js
-4) Reload Foundry and enjoy!
-5) If the GUI goes nuts, there may be problem with cache. In the Token-Action-Hud-Core configuration in Foundry you can check the box to delete the cached data - use it. If that does not help, make sure that GM is present when the users use the HUD for the first time. Last trick - if the above do not help, check your Foundry installation folder. In /Data/ there should be subfolder token-action-hud-core. Remove it's contents and login to Foundry as GM. It will recreate all necessary files.
+Adds the Armor roll and Crittical damage rolls:
 
-PS. If you like my work, and would like to support me, you can became my patron on https://www.patreon.com/benderworks 
-## License
+https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/d2deddd7-4acf-4612-8a66-746c707a73e6
+
+I have implemented initiative that is closer to the Coriolis rules for starship than the default one. (Default one just rolls d6.d6, new one rolls (Empathy + Command) d6, picks the highest dice, puts it as front digit, and checks number of it's occurences, and sets it as second digit.
+I.e, if your Capitan has 4 Empathy and 3 Command, it will roll 7d6. If the result is [ 6, 6, 5, 4, 3, 2, 1], then initiative score is: 6 (highest roll), .2 (two 6 rolled) = 6.2. It gives higher results than the default d6.d6 formula, and promotes experienced Capitans.
+
+https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/4000c87f-3754-4a3b-9396-d9832e1aa68c
+
+And last, but not least, the weapon rolls. Using HUD you don't have to remember all the attributes and bonuses of weapon rolled. The HUD will take gunners Agility + Ranged Combat + Ship Weapon Bonus and combine that all in one roll.
+
+https://github.com/kbender84/token-action-hud-coriolis/assets/66570321/330a206b-298b-4c97-9905-f778ce47ee14
+
+Enjoy! 
+
+If you like my work, and would like to support me, you can became my patron on https://www.patreon.com/benderworks
+
 
 This software is released under the MIT license.
