@@ -124,8 +124,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 img: i.img
         }});
         let pilotsArray=[];
-	let shipManouver = this.actor.system.manueverability.value;
-	//console.log(shipManouver);
+	let shipManeuver = this.actor.system.manueverability.value;
+	//console.log(shipManeuver);
         for(var each = 0 ; each < pilots.length; each++)
             {   
                 let localpilot = {
@@ -137,15 +137,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 img: pilots[each].img}
                 pilotsArray.push(localpilot) ;
 		
-                let pilotManouver = {
-                    id: pilots[each].actor_id+'Manouver' ,
+                let pilotManeuver = {
+                    id: pilots[each].actor_id+'Maneuver' ,
                     actor_id: pilots[each].actor_id, 
 		    token_id: tokenId ,
-                    type:'pilotsManouver',
-                    actor_name: pilots[each].actor_name+ ' - Manouver', 
+                    type:'pilotsManeuver',
+                    actor_name: pilots[each].actor_name+ ' - Maneuver', 
                     img: pilots[each].img,
-		    bonus: shipManouver }
-                    pilotsArray.push(pilotManouver ) ;
+		    bonus: shipManeuver }
+                    pilotsArray.push(pilotManeuver ) ;
 
             }
         let pilotsObject = pilotsArray.map(i => {return{
@@ -600,8 +600,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
            rollActorMacro('Command','advanced', actionId );
            break;
 
-	    case 'pilotsManouver':
-	        rollActorMacro('pilot','pilotsManouver', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
+	    case 'pilotsManeuver':
+	        rollActorMacro('pilot','pilotsManeuver', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
 
 	    break;
 
@@ -872,7 +872,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     range: 'long'
                     };
                 break;
-	    case 'pilotsManouver':
+	    case 'pilotsManeuver':
 		var bonusRoll = Number(title);
 		rollData = {
                     actorType: 'npc',
