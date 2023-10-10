@@ -52,7 +52,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 		this._getShipStats();
 
             }
-		//console.log(actor);
+	    //console.log(actor);
             if (actor.type === 'character' ||  actor.type === 'npc' ) 
             {
                 this._getAttributes({ id: ATTRIBUTES_ID, type: 'system' });
@@ -117,9 +117,48 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             encodedValue: [i.type,i.actor_id, i.token_id ].join(this.delimiter)    }})
         this.addActions(capitansObject , {id:'captain', type: 'system'});
 
+        let pilots = crewdata.filter(crew => crew.crewPosition==='pilot').map(i => {
+            return{
+                actor_id: i.id, 
+                actor_name: i.name, 
+                img: i.img
+        }});
+        let pilotsArray=[];
+	let shipManouver = this.actor.system.manueverability.value;
+	//console.log(shipManouver);
+        for(var each = 0 ; each < pilots.length; each++)
+            {   
+                let localpilot = {
+                id: pilots[each].actor_id,
+                actor_id: pilots[each].actor_id, 
+		token_id: tokenId ,
+                type: 'pilot',
+                actor_name: pilots[each].actor_name, 
+                img: pilots[each].img}
+                pilotsArray.push(localpilot) ;
+		
+                let pilotManouver = {
+                    id: pilots[each].actor_id+'Manouver' ,
+                    actor_id: pilots[each].actor_id, 
+		    token_id: tokenId ,
+                    type:'pilotsManouver',
+                    actor_name: pilots[each].actor_name+ ' - Manouver', 
+                    img: pilots[each].img,
+		    bonus: shipManouver }
+                    pilotsArray.push(pilotManouver ) ;
+
+            }
+        let pilotsObject = pilotsArray.map(i => {return{
+            id: i.id,
+			name: i.actor_name,
+			img: i.img,
+        encodedValue: [i.type,i.actor_id, i.token_id, i.bonus ].join(this.delimiter)    }})
+        this.addActions(pilotsObject , {id:'pilot', type: 'system'});
+
+
 	//this.addActions(crewdata.filter(crew => crew.crewPosition==='captain') , {id:'captain', type: 'system'});
 	this.addActions(crewdata.filter(crew => crew.crewPosition==='engineer') , {id:'engineer', type: 'system'});
-	this.addActions(crewdata.filter(crew => crew.crewPosition==='pilot') , {id:'pilot', type: 'system'});
+	//this.addActions(crewdata.filter(crew => crew.crewPosition==='pilot') , {id:'pilot', type: 'system'});
 	//this.addActions(crewdata.filter(crew => crew.crewPosition==='sensorOperator') , {id:'sensorOperator', type: 'system'});
 	//this.addActions(crewdata.filter(crew => crew.crewPosition==='gunner') , {id:'gunner', type: 'system'});
 	// adding data memes and weapons
@@ -406,7 +445,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     id: key,
                     name: game.i18n.localize(`YZECORIOLIS.Skill${key.capitalize()}`),
 					description: game.i18n.localize(`YZECORIOLIS.Skill${key.capitalize()}`),
-                    encodedValue: [ACTION_ADVANCED, key.capitalize(), ''].join(this.delimiter)
+                    encodedValue: [ACTION_ADVANCED, key, ''].join(this.delimiter)
                 }
             });
             //console.log(actions);
@@ -560,6 +599,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 	    case 'captain':
            rollActorMacro('Command','advanced', actionId );
            break;
+
+	    case 'pilotsManouver':
+	        rollActorMacro('pilot','pilotsManouver', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
+
+	    break;
 
         case 'shipinitiative':
             shipInitiative( actionId, payload[2] );
@@ -723,12 +767,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
  function HUDroll(skillName,inputRollType, actorData, itemData, title, damage, crit, range, features, damageText, critText) {
     //const item = this.actor.system.attributes.wits: null;
 	console.log('HUDroll details');
-    //console.log(features);
-    if(inputRollType==='shipsstatsa')
-    inputRollType='armor';
-    var bonusRoll = Number(itemData);
+	console.log(skillName);
+	console.log(inputRollType);
+	console.log(actorData);
+	console.log(itemData);
+	console.log(title);
+    	if(inputRollType==='shipsstatsa')
+    	inputRollType='armor';
 	const actor = actorData;
 	let attributeForSkill= 'wits';
+	console.log(skillName);
+	console.log(inputRollType);
 	switch (skillName){
 					  case 'technology' :
 					  case 'dataDjinn' :
@@ -823,7 +872,23 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     range: 'long'
                     };
                 break;
+	    case 'pilotsManouver':
+		var bonusRoll = Number(title);
+		rollData = {
+                    actorType: 'npc',
+                    rollType: 'weapon',
+                    bonus: bonusRoll ,
+                    modifier: 0,
+                    attributeKey: 'agility',
+                    attribute: actorData.system.attributes['agility'].value, 
+                    skillKey: 'pilot',
+                    skill: actorData.system.skills['pilot'].value,
+                    rollTitle: 'Ship pilots roll'
+                    };
+
+		break;
             case 'shipWeapon':
+		 var bonusRoll = Number(itemData);
 			//actorData=this.actor;
                 rollData = {
                     actorType: 'npc',

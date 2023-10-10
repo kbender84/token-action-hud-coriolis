@@ -1,4 +1,9 @@
 # CHANGELOG
+
+## 1.1
+Fixed bug for wits roll for all avanced skills.
+Added the Pilot - Manouver action that rolls for Pilot skill, but takes the ship Manouverability into account
+
 ## 1.0
 Found issue with LibWrapper / resolved, and ready for the 1.0 release
 
