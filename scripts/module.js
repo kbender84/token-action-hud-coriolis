@@ -597,7 +597,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                 game.yzecoriolis.rollItemMacro(actionId);
                 break;
 	    case 'captain':
-           rollActorMacro('Command','advanced', actionId );
+           rollActorMacro('command','advanced', actionId );
            break;
 
 	    case 'pilotsManeuver':
@@ -620,15 +620,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             break;
     
      	case 'engineer':
-		    rollActorMacro('Technology', 'advanced',actionId  );
+		    rollActorMacro('technology', 'advanced',actionId  );
 		    //console.log('engisss');
 		    break;
 	    case 'sensorOperator':
-		    rollActorMacro('DataDjinn','advanced', actionId );
+		    rollActorMacro('dataDjinn','advanced', actionId );
 		    //console.log('sensoropssss');
 		    break;
 	    case 'pilot':
-		    rollActorMacro( 'Pilot', 'advanced', actionId );
+		    rollActorMacro( 'pilot', 'advanced', actionId );
 		    //console.log('pilotsss');
 		    break;
 	    case 'gunner':

@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.1.1
+Ship command and pilot roll uses correct attribute now
+
 ## 1.1
 Fixed bug for wits roll for all avanced skills.
 Added the Pilot - Manouver action that rolls for Pilot skill, but takes the ship Manouverability into account
