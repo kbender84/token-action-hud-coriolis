@@ -574,7 +574,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     /* ROLL HANDLER */
 
     CoriolisRollHandler = class CoriolisRollHandler extends coreModule.api.RollHandler {
-        doHandleActionEvent(event, encodedValue) {
+        handleActionClick(event, encodedValue) {
             let payload = encodedValue.split("|");
         
             if (payload.length < 2) {
@@ -753,15 +753,28 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             
           	};
 		var inititativeScore = maxResult+'.'+countMaxResult;
-		var combatantId = game.combat.combatants.find (i=>i._source.tokenId === shipTokenId)._id;
-		console.log(combatantId );
-
-		let initiative = [{
-            		_id: combatantId ,
-            		initiative:inititativeScore 
-        	}];
+		
+		if( game.combat == null || game.combat.combatants._source.length== 0)
+			{
+				ui.notifications.info("Add token to combat first");
+			}
+			else
+			{
+				var combatantId = game.combat.combatants.find (i=>i._source.tokenId === shipTokenId)._id;
+	
+				if (combatantId == null)
+					{cosole.log("combatant null");}
+				else
+					{
+						let initiative = [{
+            					_id: combatantId ,
+            					initiative: inititativeScore 
+        					}];
     		
-    		game.combat.updateEmbeddedDocuments("Combatant", initiative);	}
+    						game.combat.updateEmbeddedDocuments("Combatant", initiative);	
+					}
+		}
+	}
 
 
  function HUDroll(skillName,inputRollType, actorData, itemData, title, damage, crit, range, features, damageText, critText) {
@@ -772,6 +785,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 	console.log(actorData);
 	console.log(itemData);
 	console.log(title);
+	var bonusRoll = itemData;
     	if(inputRollType==='shipsstatsa')
     	inputRollType='armor';
 	const actor = actorData;
@@ -838,20 +852,17 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 				};
 			break;
 			case 'armorRoll':
-            case 'armor':
+            	case 'armor':
+		console.log("armor roll "+ bonusRoll);
 			//actorData=this.actor;
 			rollData = {
 				actorType: 'npc',
 				rollType: 'armor',
-				bonus: bonusRoll,
-                modifier: 0,
-                attributeKey: 'strenght',
-                attribute: 1, 
-                skillKey: 'agility',
-                skill: 1,
-                features: 'Core Rules',
+				bonus: Number(bonusRoll),
+                               features: 'Core Rules',
                 rollTitle: 'Armor Roll'
 				};
+			console.log(rollData );
 			break;
             case 'meme':
                 rollData = {
@@ -1252,7 +1263,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
     const module = game.modules.get('token-action-hud-coriolis');
     module.api = {
-        requiredCoreModuleVersion: '1.4',
+        requiredCoreModuleVersion: '1.5',
         SystemManager: CoriolisSystemManager
     }    
      Hooks.call('tokenActionHudSystemReady', module)

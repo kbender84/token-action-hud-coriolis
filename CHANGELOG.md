@@ -1,4 +1,9 @@
 # CHANGELOG
+## 1.1.4
+armor ship roll issue fixed
+
+## 1.1.3 
+Support for tokenhub 1.5
 
 ## 1.1.1
 Ship command and pilot roll uses correct attribute now
