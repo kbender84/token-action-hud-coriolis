@@ -236,7 +236,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 					weaponId: shipModulesWeapons[wepkey]._id, 
 					img: gunners[gunkey].img, 
 					name: gunners[gunkey].actor_name+ ' - ' + shipModulesWeapons[wepkey].name ,
-                   				type:'weaponroll',
+                   				type:'shipweaponroll',
                    				damage: shipModulesWeapons[wepkey].system.damage,
                     				damageText: shipModulesWeapons[wepkey].system.damageText,
                     				bonus: shipModulesWeapons[wepkey].system.bonus,
@@ -459,14 +459,15 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             let actions = weaponList.map(i => {
                 return{
                     id: i._id, 
+	            actorId: this.actor.id,
                     name: i.name, 
 			description: i.system.description,
-                    encodedValue: [ACTION_WEAPON, i.name, i.system.description].join(this.delimiter),
+                    encodedValue: [ACTION_WEAPON, this.actor.id, i._id,i.name ,i.system.damage,i.system.damageText, i.system.bonus, i.system.range].join(this.delimiter),
                     img: i.img
                     }
                     }
                     );
-        
+            //console.log('weapon action');
             //console.log(actions);
             this.addActions(actions, parent);
 
@@ -576,7 +577,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     CoriolisRollHandler = class CoriolisRollHandler extends coreModule.api.RollHandler {
         handleActionClick(event, encodedValue) {
             let payload = encodedValue.split("|");
-        
+            console.log(payload);
             if (payload.length < 2) {
             super.throwInvalidValueErr();
             }
@@ -594,8 +595,12 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             switch (macroType) {
 		case ACTION_WEAPON:
                 // item-roll
-                game.yzecoriolis.rollItemMacro(actionId);
-                break;
+                //console.log('action weapon actor');
+		//console.log(payload[1]);
+
+                //game.yzecoriolis.rollItemMacro(actionId);
+		rollActorMacro('rangedCombat','actorWeapon', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
+		break;
 	    case 'captain':
            rollActorMacro('command','advanced', actionId );
            break;
@@ -610,8 +615,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
             // SERVICE!
             break;
 
-        case 'weaponroll':
-		//console.log(payload);
+        case 'shipweaponroll':
+		console.log(payload);
 
             rollActorMacro('rangedCombat','shipWeapon', payload[1], payload[2], payload[3], payload[4], payload[5], payload[6],  payload[7], payload[8], payload[9]  );
             break;
@@ -790,8 +795,8 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
     	inputRollType='armor';
 	const actor = actorData;
 	let attributeForSkill= 'wits';
-	console.log(skillName);
-	console.log(inputRollType);
+	//console.log(skillName);
+	//console.log(inputRollType);
 	switch (skillName){
 					  case 'technology' :
 					  case 'dataDjinn' :
@@ -919,6 +924,53 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     range: range
                     };
                 break;
+	    case 'actorWeapon':
+		 var bonusRoll = Number(itemData);
+	         //actorData=this.actor;
+		
+		console.log('actor weapon roll data');
+		var actorWeapons = actorData.items.filter(i => i.id === itemData);
+		var actorWeapon= actorWeapons[0];
+		var rollAttribute = 'strength';
+		var rollAttributeValue = actorData.system.attributes['strength'].value;
+		var rollSkill = 'meleecombat';
+		var rollSkillValue = actorData.system.skills['meleecombat'].value;
+		//ranged weapons
+		if ( actorWeapon.system.melee === false)
+			{
+				rollAttribute = 'agility';
+				rollAttributeValue = actorData.system.attributes['agility'].value;
+				rollSkill = 'rangedcombat';
+				rollSkillValue = actorData.system.skills['rangedcombat'].value;
+			}
+		//Veterans of third horizon
+		//has Black Lotus Dance talent
+		var actorHasBlackLotusDanceTalent = actorData.items.filter(i => i.name === 'Black Lotus Dancer');
+				if ( (actorWeapon.name === 'Hand fan (Ahlam)' || actorWeapon.name === 'Unarmed')&&actorHasBlackLotusDanceTalent.length >=1)
+			{
+				rollAttribute = 'agility';
+				rollAttributeValue = actorData.system.attributes['agility'].value;
+			}
+                rollData = {
+                    actorType: 'npc',
+                    rollType: 'weapon',
+                    bonus: actorWeapon.system.bonus,
+                    modifier: 0,
+		    attributeKey: rollAttribute ,
+                    attribute: rollAttributeValue , 
+		    skillKey: rollSkill,
+                    skill: rollSkillValue,
+                    features: Object.values(actorWeapon.system.special),
+                    rollTitle: actorWeapon.name,
+                    damage: actorWeapon.system.damage,
+                    damageText: actorWeapon.system.damageText,
+                    crit: actorWeapon.system.crit.numericValue,
+                    critText: actorWeapon.system.crit.customValue,
+                    range: actorWeapon.system.range
+                    };
+		console.log(rollData);
+                break;
+
 			//title, damage, crit, range
 	}
 	
@@ -946,6 +998,9 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 		if (typeof actorIdcrew !== "undefined") {
 			actor=game.actors.filter(a=>  a.id == actorIdcrew)[0];
 		}
+//	console.log('actor id');
+//	console.log(actor);
+//	console.log(actorIdcrew);
         if(itemId)
         {
             return HUDroll(rollName, rollType, actor,itemId, title, damage, crit, range, features, damageText, critText);
