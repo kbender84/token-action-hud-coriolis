@@ -2,7 +2,7 @@
     "id": "token-action-hud-coriolis",
     "title": "Token Action HUD Coriolis",
     "description": "Provide support for the coriolis game system with Token Action HUD Core",
-    "version": "1.1.4",
+    "version": "1.2.0",
     "compatibility": {
         "minimum": 10,
         "verified": 11
@@ -44,9 +44,27 @@
     "esmodules": [
         "scripts/module.js"
     ],
+  "packs": [
+    {
+      "name": "token-action-hud-coriolis-macros",
+      "label": "TAH Coriilis Macros",
+      "path": "packs/token-action-hud-coriolis-macros",
+      "type": "Macro",
+      "module": "token-action-hud-coriolis"
+    },
+    {
+      "name": "token-action-hud-coriolis-rolltables",
+      "label": "TAH Coriolis RollTables",
+      "path": "packs/token-action-hud-coriolis-rolltables",
+      "module": "token-action-hud-coriolis",
+      "entity": "RollTable",
+      "type": "RollTable"
+
+    }
+  ],
     "url": "https://github.com/kbender84/token-action-hud-coriolis",
-    "manifest": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/1.1.4/module.json",
-    "download": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/1.1.4/token-action-hud-coriolis.zip",
+    "manifest": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/1.2.0/module.json",
+    "download": "https://github.com/kbender84/token-action-hud-coriolis/releases/download/1.2.0/token-action-hud-coriolis.zip",
     "license": "LICENSE",
     "readme": "README.md"
 }
