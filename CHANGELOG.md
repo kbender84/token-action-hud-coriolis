@@ -1,4 +1,10 @@
 # CHANGELOG
+## 1.3.1 
+added the gear and talent bonuses to the rolls
+
+## 1.3
+handles changes of Coriolis core system 3.7.0, without the gear bonus (still in progress), update thanks to kagedansa
+
 ## 1.1.4
 armor ship roll issue fixed
 

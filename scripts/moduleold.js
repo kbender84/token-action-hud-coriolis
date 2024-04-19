@@ -2,8 +2,7 @@ export let CoriolisActionHandler = null
 export let CoriolisRollHandler = null
 export let CoriolisSystemManager = null
 
-import { coriolisRoll } from "/systems/yzecoriolis/module/coriolis-roll.js";
-import { CoriolisModifierDialog } from "/systems/yzecoriolis/module/coriolisRollModifier.js";
+import { coriolisRoll, coriolisModifierDialog } from "/systems/yzecoriolis/module/coriolis-roll.js";
 import { getCrewForShip} from "/systems/yzecoriolis/module/actor/crew.js";
 
 Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
@@ -786,13 +785,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
  function HUDroll(skillName,inputRollType, actorData, itemData, title, damage, crit, range, features, damageText, critText) {
     //const item = this.actor.system.attributes.wits: null;
 	console.log('HUDroll details');
-	//console.log(skillName);
-	//console.log(inputRollType);
-	//console.log(actorData);
-	//console.log(actorData.system.itemModifiers.force);
-	//console.log(itemData);
-	//console.log(title);
-	//console.log('HUDroll details END');
+	console.log(skillName);
+	console.log(inputRollType);
+	console.log(actorData);
+	console.log(itemData);
+	console.log(title);
 	var bonusRoll = itemData;
     	if(inputRollType==='shipsstatsa')
     	inputRollType='armor';
@@ -827,7 +824,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 					  break;
 					}
 	let rollData;
-	console.log(actorData);
+	
 	switch (inputRollType) {
 			case 'attribute':
                 rollData = {
@@ -844,7 +841,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 			
 			case 'general' :
 			case 'advanced' :
-				rollData = {
+                rollData = {
 
 				  actorType: actorData.type,
 				  rollType: inputRollType,
@@ -855,23 +852,20 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 				  modifier: 0,
 				  bonus: bonusRoll,
 				  rollTitle: game.i18n.localize(`YZECORIOLIS.Skill${skillName.capitalize()}`)+' Roll', //import nice name
-				  pushed: false,
-				  itemModifiers: actorData.system.itemModifiers[skillName.toLowerCase()]
+				  pushed: false
 				  //features: item?.special ? Object.values(item.special).join(", ") : "",
 				};
 			break;
 			case 'armorRoll':
             	case 'armor':
-		//console.log("armor roll "+ bonusRoll);
+		console.log("armor roll "+ bonusRoll);
 			//actorData=this.actor;
-			itemModifiers = actorData.itemModifiers.armor;
 			rollData = {
 				actorType: 'npc',
 				rollType: 'armor',
 				bonus: Number(bonusRoll),
                                features: 'Core Rules',
-                rollTitle: 'Armor Roll',
-				itemModifiers: itemModifiers
+                rollTitle: 'Armor Roll'
 				};
 			console.log(rollData );
 			break;
@@ -891,8 +885,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     damageText: 'Ship module',
                     crit: 0,
                     critText: '',
-                    range: 'long',
-		    itemModifiers: actorData.system.itemModifiers.dataDjinn
+                    range: 'long'
                     };
                 break;
 	    case 'pilotsManeuver':
@@ -906,8 +899,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     attribute: actorData.system.attributes['agility'].value, 
                     skillKey: 'pilot',
                     skill: actorData.system.skills['pilot'].value,
-                    rollTitle: 'Ship pilots roll',
-		    itemModifiers: actorData.system.itemModifiers.pilot
+                    rollTitle: 'Ship pilots roll'
                     };
 
 		break;
@@ -929,8 +921,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     damageText: damageText,
                     crit: Number(crit),
                     critText: critText,
-                    range: range,
-		    itemModifiers: actorData.system.itemModifiers.rangedCombat
+                    range: range
                     };
                 break;
 	    case 'actorWeapon':
@@ -960,7 +951,6 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 				rollAttribute = 'agility';
 				rollAttributeValue = actorData.system.attributes['agility'].value;
 			}
-			//console.log(actorWeapon);
                 rollData = {
                     actorType: 'npc',
                     rollType: 'weapon',
@@ -975,26 +965,25 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
                     damage: actorWeapon.system.damage,
                     damageText: actorWeapon.system.damageText,
                     crit: actorWeapon.system.crit.numericValue,
-	            isAutomatic: actorWeapon.system.automatic,
                     critText: actorWeapon.system.crit.customValue,
-                    range: actorWeapon.system.range,
-		    itemModifiers: actorData.system.itemModifiers[rollSkill.toLowerCase()]
-
+                    range: actorWeapon.system.range
                     };
+		console.log(rollData);
                 break;
 
 			//title, damage, crit, range
 	}
-
-	//console.log("Roll data");
-	//console.log(rollData);
-
+	
     const chatOptions = actor._prepareChatRollOptions(
       "systems/yzecoriolis/templates/sidebar/roll.html",
      inputRollType
     );
-    console.log(rollData);
-        new CoriolisModifierDialog(rollData, chatOptions).render(true);
+   // console.log(rollData);
+    coriolisModifierDialog((modifier, additionalData) => {
+      rollData.modifier = modifier;
+      rollData.additionalData = additionalData;
+      coriolisRoll(chatOptions, rollData);
+    }, false);
     
   }
 
