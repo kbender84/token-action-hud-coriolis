@@ -1026,7 +1026,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
     CoriolisSystemManager = class CoriolisSystemManager extends coreModule.api.SystemManager {
         /** @override */
-        doGetActionHandler () {
+        getActionHandler () {
             return new CoriolisActionHandler()
         }
 
@@ -1037,16 +1037,16 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
         }
 
         /** @override */
-        doGetRollHandler (handlerId) {
+        getRollHandler (handlerId) {
             return new CoriolisRollHandler()
         }
 
         /** @override */
-        /*doRegisterSettings (updateFunc) {
+        /*registerSettings (updateFunc) {
             systemSettings.register(updateFunc)
         }*/
 
-        async doRegisterDefaultFlags () {
+        async registerDefaults () {
             const ATTRIBUTES_NAME    = game.i18n.localize('YZECORIOLIS.Attributes');
             const GENERAL_NAME		 = game.i18n.localize('YZECORIOLIS.SkillCatGeneral');
             const ADVANCED_NAME		 = game.i18n.localize('YZECORIOLIS.SkillCatAdvanced');
@@ -1329,7 +1329,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
     const module = game.modules.get('token-action-hud-coriolis');
     module.api = {
-        requiredCoreModuleVersion: '1.5',
+        requiredCoreModuleVersion: '2.0',
         SystemManager: CoriolisSystemManager
     }    
      Hooks.call('tokenActionHudSystemReady', module)
