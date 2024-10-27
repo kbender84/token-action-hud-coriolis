@@ -1,4 +1,15 @@
 # CHANGELOG
+
+## 1.4
+Token Action Hud 2.0 finally working
+
+## 1.3.3
+forcing back TAH 1.5.7 dependency, module needs large overhaul to work with TAH 2.0
+
+
+## 1.3.2
+updated TAH core 2.0 depenedency
+
 ## 1.3.1 
 added the gear and talent bonuses to the rolls
 
