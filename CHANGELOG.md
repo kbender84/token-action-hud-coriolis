@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## 1.4.1
+Small bug fixing (additional console output) + v 13 foundry support
+
+
 ## 1.4
 Token Action Hud 2.0 finally working
 

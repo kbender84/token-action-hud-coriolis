@@ -1009,9 +1009,11 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 		if (typeof actorIdcrew !== "undefined") {
 			actor=game.actors.filter(a=>  a.id == actorIdcrew)[0];
 		}
-//	console.log('actor id');
-//	console.log(actor);
-//	console.log(actorIdcrew);
+	console.log('actor id');
+	console.log(actor);
+	console.log(actorIdcrew);
+    console.log(rollName);
+    console.log(rollType);
         if(itemId)
         {
             return HUDroll(rollName, rollType, actor,itemId, title, damage, crit, range, features, damageText, critText);
