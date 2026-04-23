@@ -2,10 +2,10 @@
     "id": "token-action-hud-coriolis",
     "title": "Token Action HUD Coriolis",
     "description": "Provide support for the coriolis game system with Token Action HUD Core",
-    "version": "1.4.1",
+    "version": "1.4.2",
     "compatibility": {
         "minimum": 10,
-        "verified": 12
+        "verified": 13
     },
     "authors": [
         {
@@ -35,8 +35,8 @@
                 "type": "module",
                 "compatibility": [
                     {
-                        "minimum": "1.5",
-                        "verified": "1.5"                    }
+                        "minimum": "2",
+                        "verified": "2"                    }
                 ]
             }
         ]

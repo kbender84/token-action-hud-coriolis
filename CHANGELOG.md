@@ -1,5 +1,8 @@
 # CHANGELOG
 
+## 1.4.2
+Update for Token Action Hud Core 2.1
+
 ## 1.4.1
 Small bug fixing (additional console output) + v 13 foundry support
 
