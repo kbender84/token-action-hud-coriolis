@@ -1331,7 +1331,7 @@ Hooks.on('tokenActionHudCoreApiReady', async (coreModule) => {
 
     const module = game.modules.get('token-action-hud-coriolis');
     module.api = {
-        requiredCoreModuleVersion: '2.0',
+        requiredCoreModuleVersion: '2',
         SystemManager: CoriolisSystemManager
     }    
      Hooks.call('tokenActionHudSystemReady', module)
